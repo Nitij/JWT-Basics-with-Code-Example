@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div>
+    <button id="btnLogin">Login</button>
+    <br /><br />
+    <b>Message:</b> <span id="spanMessage"></span>
+    <br /><br />
+    <b>Token:</b> <span id="spanToken"></span>
+    <br /><br />
+    <button id="btnEmployeeList">Get Employees</button>
+</div>
+
+<script>
+    let token = '';
+    let btnLogin = document.querySelector('#btnLogin');
+    let spanMessage = document.querySelector('#spanMessage');
+    let spanToken = document.querySelector('#spanToken');
+    let btnEmployeeList = document.querySelector('#btnEmployeeList');
+
+    btnLogin.addEventListener('click', () => {
+        login();
+    });
+
+    btnEmployeeList.addEventListener('click', () => {
+        getEmployeeList();
+    });
+
+    async function login() {
+        let loginObj = {
+            UserName: 'John',
+            Password: 'password'
+        };
+
+        let options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(loginObj)
+        };
+
+        let response = await fetch('api/Login', options);
+        let jsonObj = await response.json();
+
+        if (jsonObj.jwtToken) {
+            token = jsonObj.jwtToken;
+            spanToken.textContent = token;
+        }
+
+        spanMessage.textContent = jsonObj.message;
+    }
+
+    async function getEmployeeList() {
+        let options = {
+            method: 'GET',
+            headers: {
+                "Authorization": 'Bearer ' + token
+            }
+        };
+
+        let response = await fetch('api/Employee', options);
+        let jsonObj = await response.json();
+
+        console.log(jsonObj.employees);
+        spanMessage.textContent = jsonObj.message;
+    }
+</script>
